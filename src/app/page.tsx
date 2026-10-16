@@ -15,6 +15,7 @@ export default function FeedPage() {
   const supabase = createClient();
 
   const [polls, setPolls] = useState<Poll[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [voteCounts, setVoteCounts] = useState<Record<string, number>>({});
   const [userVotes, setUserVotes] = useState<Record<string, string>>({});
   const [votingPollId, setVotingPollId] = useState<string | null>(null);
@@ -31,6 +32,9 @@ export default function FeedPage() {
 
     async function loadInitial() {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!ignore) {
+        setCurrentUserId(user?.id || null);
+      }
 
       const { data, error: fetchError } = await supabase
         .from("polls")
@@ -87,8 +91,14 @@ export default function FeedPage() {
     }
 
     loadInitial();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUserId(session?.user?.id || null);
+    });
+
     return () => {
       ignore = true;
+      subscription.unsubscribe();
     };
   }, [supabase, retryCount]);
 
@@ -179,7 +189,6 @@ export default function FeedPage() {
           [pollId]: "Bu ankete zaten oy verdin.",
         }));
 
-        // Kullanıcının daha önce verdiği oyu alıp sonuçları göster
         const { data: existingVote } = await supabase
           .from("votes")
           .select("option_id")
@@ -198,12 +207,29 @@ export default function FeedPage() {
       return;
     }
 
-    // Başarılı oy: anında barları güncelle ve animasyonu başlat
     setUserVotes((prev) => ({ ...prev, [pollId]: optionId }));
     setVoteCounts((prev) => ({
       ...prev,
       [optionId]: (prev[optionId] || 0) + 1,
     }));
+  }
+
+  async function handleDeletePoll(pollId: string) {
+    const { error: delError } = await supabase
+      .from("polls")
+      .delete()
+      .eq("id", pollId);
+
+    if (delError) {
+      setPollErrors((prev) => ({
+        ...prev,
+        [pollId]: delError.message || "Anket silinemedi.",
+      }));
+      return;
+    }
+
+    // Anket başarıyla silindiğinde arayüzden kaldır
+    setPolls((prev) => prev.filter((p) => p.id !== pollId));
   }
 
   return (
@@ -267,9 +293,11 @@ export default function FeedPage() {
             <PollCard
               key={poll.id}
               poll={poll}
+              currentUserId={currentUserId}
               userVotedOptionId={userVotes[poll.id] || null}
               voteCounts={voteCounts}
               onVote={handleVote}
+              onDelete={handleDeletePoll}
               isVoting={votingPollId === poll.id}
               voteError={pollErrors[poll.id] || null}
             />
