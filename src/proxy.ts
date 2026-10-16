@@ -1,14 +1,21 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Next.js 16'da middleware.ts -> proxy.ts olarak yeniden adlandırıldı.
+// Next.js 16'da middleware.ts -> proxy.ts olarak adlandırıldı.
 // Görevi: her istekte Supabase oturumunu (token) yenilemek.
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return response;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -30,7 +37,7 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // Oturumu doğrular ve gerekirse yeniler. Bu çağrı ile response arasına kod ekleme.
+  // Oturumu doğrular ve gerekirse yeniler.
   await supabase.auth.getClaims();
 
   return response;
