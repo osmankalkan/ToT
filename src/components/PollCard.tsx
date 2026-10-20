@@ -2,7 +2,7 @@
 
 import { formatRelativeTime } from "@/lib/utils";
 import type { Poll } from "@/types";
-import { User, Clock, Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { PollOptionItem } from "./PollOptionItem";
 import { PollDeleteButton } from "./PollDeleteButton";
 
@@ -41,74 +41,100 @@ export function PollCard({
   );
 
   return (
-    <article className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition hover:shadow-md">
-      {/* Üst bilgi: Yazar, Tarih ve Varsa Sahibine Özel Silme Butonu */}
-      <div className="mb-3 flex items-center justify-between text-xs text-gray-500">
-        <div className="flex items-center gap-1.5 font-medium text-gray-700">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-100 text-gray-600">
-            <User className="h-3 w-3" />
-          </div>
-          <span>@{authorName}</span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 text-gray-400">
-            <Clock className="h-3 w-3" />
-            <time dateTime={poll.created_at}>{formatRelativeTime(poll.created_at)}</time>
+    <article className="border border-line bg-white transition-colors hover:border-ink">
+      <div className="p-5 sm:p-6">
+        {/* Üst bilgi */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <span
+              aria-hidden
+              className="flex h-9 w-9 shrink-0 items-center justify-center bg-ink font-serif text-lg italic leading-none text-paper"
+            >
+              {authorName.charAt(0).toUpperCase()}
+            </span>
+            <div className="flex min-w-0 flex-col">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="truncate font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink">
+                  @{authorName}
+                </span>
+                {isOwner && (
+                  <span className="border border-ink bg-signal px-1.5 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-ink">
+                    Senin
+                  </span>
+                )}
+              </div>
+              <time
+                dateTime={poll.created_at}
+                className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.1em] text-ink/65"
+              >
+                {formatRelativeTime(poll.created_at)}
+              </time>
+            </div>
           </div>
 
           {isOwner && onDelete && (
             <PollDeleteButton pollId={poll.id} onDelete={onDelete} />
           )}
         </div>
-      </div>
 
-      {/* Soru */}
-      <h2 className="mb-4 text-base sm:text-lg font-bold text-gray-900 leading-snug">
-        {poll.question}
-      </h2>
+        {/* Soru */}
+        <h3 className="mt-5 font-serif text-[25px] leading-[1.08] tracking-[-0.01em] text-ink text-balance sm:text-[28px]">
+          {poll.question}
+        </h3>
 
-      {/* Hata Bildirimi */}
-      {voteError && (
-        <div className="mb-3 flex items-center gap-2 rounded-lg bg-red-50 p-2.5 text-xs text-red-700">
-          <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
-          <span>{voteError}</span>
-        </div>
-      )}
-
-      {/* Seçenekler Listesi */}
-      <div className="space-y-2.5">
-        {sortedOptions.map((option) => {
-          const isSelected = userVotedOptionId === option.id;
-          const count = voteCounts[option.id] || 0;
-          const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
-
-          return (
-            <PollOptionItem
-              key={option.id}
-              option={option}
-              hasVoted={hasVoted}
-              isSelected={isSelected}
-              count={count}
-              percentage={percentage}
-              isVoting={isVoting}
-              onVote={() => onVote(poll.id, option.id)}
-            />
-          );
-        })}
-      </div>
-
-      {/* Alt Bilgi */}
-      <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
-        {hasVoted ? (
-          <span>Toplam {totalVotes} oy</span>
-        ) : (
-          <span className="text-gray-400">Sonuçları görmek için tıkla ve oy ver</span>
+        {/* Hata bildirimi */}
+        {voteError && (
+          <div
+            role="alert"
+            className="mt-3 flex items-center gap-2 border-l-2 border-l-alert bg-smoke px-3 py-2 text-xs text-ink"
+          >
+            <AlertCircle className="h-3.5 w-3.5 shrink-0 text-alert" />
+            <span>{voteError}</span>
+          </div>
         )}
+
+        {/* Seçenekler */}
+        <div className="mt-5 space-y-2">
+          {sortedOptions.map((option) => {
+            const isSelected = userVotedOptionId === option.id;
+            const count = voteCounts[option.id] || 0;
+            const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+
+            return (
+              <PollOptionItem
+                key={option.id}
+                option={option}
+                hasVoted={hasVoted}
+                isSelected={isSelected}
+                count={count}
+                percentage={percentage}
+                isVoting={isVoting}
+                onVote={() => onVote(poll.id, option.id)}
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Alt bilgi */}
+      <div className="flex items-center justify-between gap-3 border-t border-line px-5 py-2.5 font-mono text-[9px] uppercase tracking-[0.12em] text-ink/65 sm:px-6">
+        {hasVoted ? (
+          <span>
+            {String(totalVotes).padStart(2, "0")} oy
+            <span
+              aria-hidden
+              className="mx-2 inline-block h-3 w-px bg-ink/30 align-middle"
+            />
+            Sonuçlar
+          </span>
+        ) : (
+          <span>Sonuçlar gizli — oyla</span>
+        )}
+
         {isVoting && (
-          <span className="flex items-center gap-1 text-indigo-600 font-medium">
+          <span className="flex items-center gap-1.5 text-alert">
             <Loader2 className="h-3 w-3 animate-spin" />
-            <span>Oy kaydediliyor...</span>
+            Kaydediliyor
           </span>
         )}
       </div>

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { Option } from "@/types";
-import { Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 interface PollOptionItemProps {
   option: Option;
@@ -23,17 +23,17 @@ export function PollOptionItem({
   isVoting,
   onVote,
 }: PollOptionItemProps) {
+  const letter = String.fromCharCode(64 + option.position);
+
   if (hasVoted) {
     return (
       <div
-        className={`relative flex flex-col overflow-hidden rounded-xl border transition ${
-          isSelected
-            ? "border-indigo-600 bg-indigo-50/20"
-            : "border-gray-200 bg-white"
+        className={`relative isolate overflow-hidden border transition-colors ${
+          isSelected ? "border-ink bg-white" : "border-line bg-white"
         }`}
       >
         {option.image_url && (
-          <div className="relative h-36 w-full overflow-hidden bg-gray-100">
+          <div className="relative h-40 w-full overflow-hidden border-b border-line bg-smoke">
             <Image
               src={option.image_url}
               alt={option.text}
@@ -44,32 +44,51 @@ export function PollOptionItem({
           </div>
         )}
 
-        {/* Yüzde Barı (Tailwind transition-all duration-500) */}
+        {/* Yüzde barı */}
         <div
-          className={`absolute inset-y-0 left-0 transition-all duration-500 ease-out ${
-            isSelected ? "bg-indigo-100/90" : "bg-gray-100/80"
+          aria-hidden
+          className={`absolute inset-y-0 left-0 -z-10 transition-all duration-700 ease-out ${
+            isSelected ? "bg-signal/15" : "bg-smoke/60"
           }`}
           style={{ width: `${percentage}%` }}
         />
 
-        <div className="relative z-10 flex items-center justify-between p-3.5">
-          <div className="flex items-center gap-2 pr-2">
-            {isSelected && (
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white shadow-2xs">
-                <Check className="h-3 w-3 stroke-[3]" />
-              </span>
-            )}
+        <div className="flex items-center justify-between gap-3 px-3.5 py-3">
+          <div className="flex min-w-0 items-center gap-2.5">
             <span
-              className={`text-sm ${
-                isSelected ? "font-bold text-indigo-950" : "font-medium text-gray-800"
+              className={`flex h-7 w-7 shrink-0 items-center justify-center border font-mono text-[10px] font-semibold ${
+                isSelected
+                  ? "border-ink bg-signal text-ink"
+                  : "border-ink/20 text-ink/65"
+              }`}
+            >
+              {isSelected ? <Check className="h-3.5 w-3.5 stroke-[3]" /> : letter}
+            </span>
+            <span
+              className={`truncate text-sm ${
+                isSelected ? "font-semibold text-ink" : "text-ink/65"
               }`}
             >
               {option.text}
             </span>
+            {isSelected && (
+              <span className="hidden shrink-0 border border-ink px-1.5 py-0.5 font-mono text-[8px] uppercase tracking-[0.1em] text-ink sm:inline">
+                Oyun
+              </span>
+            )}
           </div>
-          <div className="flex items-center gap-2 shrink-0 text-xs">
-            <span className="text-gray-500">{count} oy</span>
-            <span className="font-bold text-gray-900">%{percentage}</span>
+
+          <div className="flex shrink-0 items-baseline gap-2.5">
+            <span className="font-mono text-[9px] tracking-[0.04em] text-ink/65">
+              {count} oy
+            </span>
+            <span
+              className={`font-mono text-base font-bold tabular-nums ${
+                isSelected ? "text-alert" : "text-ink/70"
+              }`}
+            >
+              %{percentage}
+            </span>
           </div>
         </div>
       </div>
@@ -81,10 +100,11 @@ export function PollOptionItem({
       type="button"
       disabled={isVoting}
       onClick={onVote}
-      className="group relative flex w-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-gray-50/50 text-left transition hover:border-indigo-400 hover:bg-indigo-50/20 active:scale-[0.99] disabled:opacity-50"
+      aria-label={`${option.text} seçeneğine oy ver`}
+      className="group flex w-full flex-col overflow-hidden border border-line bg-white text-left transition-colors hover:border-ink hover:bg-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink active:bg-ink disabled:pointer-events-none disabled:opacity-50"
     >
       {option.image_url && (
-        <div className="relative h-36 w-full overflow-hidden bg-gray-100">
+        <div className="relative h-40 w-full overflow-hidden border-b border-line bg-smoke">
           <Image
             src={option.image_url}
             alt={option.text}
@@ -94,12 +114,20 @@ export function PollOptionItem({
           />
         </div>
       )}
-      <div className="flex items-center justify-between p-3.5">
-        <span className="text-sm font-medium text-gray-800 group-hover:text-gray-900">
-          {option.text}
-        </span>
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-300 text-[10px] font-bold text-gray-400 group-hover:border-indigo-500 group-hover:text-indigo-600">
-          {String.fromCharCode(64 + option.position)}
+
+      <div className="flex items-center justify-between gap-3 px-3.5 py-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center border border-ink/25 font-mono text-[10px] font-semibold text-ink/70 transition-colors group-hover:border-paper/40 group-hover:text-paper">
+            {letter}
+          </span>
+          <span className="truncate text-sm font-medium text-ink transition-colors group-hover:text-paper">
+            {option.text}
+          </span>
+        </div>
+
+        <span className="flex shrink-0 items-center gap-1.5 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink/65 transition-colors group-hover:text-paper/70">
+          <span className="hidden sm:inline">Oyla</span>
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </span>
       </div>
     </button>
