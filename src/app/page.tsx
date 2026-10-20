@@ -6,7 +6,13 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PollCard } from "@/components/PollCard";
 import type { Poll } from "@/types";
-import { Loader2, AlertCircle, PlusCircle, Sparkles } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Loader2,
+} from "lucide-react";
 
 const PAGE_SIZE = 10;
 
@@ -228,61 +234,220 @@ export default function FeedPage() {
       return;
     }
 
-    // Anket başarıyla silindiğinde arayüzden kaldır
     setPolls((prev) => prev.filter((p) => p.id !== pollId));
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between pb-2 border-b border-gray-200">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-gray-900">En Yeni Anketler</h1>
-          <p className="text-xs text-gray-500">Topluluğun kararsız kaldığı sorulara oy ver</p>
+    <div className="space-y-8">
+      {/* Gündem */}
+      <section>
+        <div className="grid gap-8 sm:grid-cols-[1.35fr_1fr] sm:items-start">
+          <div>
+            <div className="flex items-center gap-3 font-mono text-[9px] uppercase tracking-[0.2em] text-ink/65">
+              <span className="h-px w-8 bg-ink" />
+              Gündem — 01
+            </div>
+
+            <h1 className="mt-4 font-serif text-[44px] leading-[0.94] tracking-[-0.02em] text-ink sm:text-[58px]">
+              Kararsız mısın?
+              <br />
+              Sor. Oylat.
+              <br />
+              <span className="italic text-alert">Karar ver.</span>
+            </h1>
+
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-ink/65">
+              İki seçenek arasında mı kaldın? Sorunu yaz, seçenekleri koy;
+              kararı topluluk versin.
+            </p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <Link
+                href="/create"
+                className="group inline-flex items-center gap-3 bg-ink px-5 py-3.5 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-paper transition-colors hover:bg-signal hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+              >
+                Anket aç
+                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </Link>
+              <a
+                href="#feed"
+                className="inline-flex items-center gap-2 border-b border-ink pb-1 font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-ink transition-colors hover:border-signal hover:text-alert focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+              >
+                Akışa in
+                <ArrowDown className="h-3.5 w-3.5" />
+              </a>
+            </div>
+
+            <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.16em] text-ink/65">
+              Ücretsiz · 30 saniyede anket
+            </p>
+          </div>
+
+          {/* Karar şeması */}
+          <div className="hidden sm:block">
+            <div className="relative border border-ink">
+              <div className="grid grid-cols-2">
+                <div className="flex aspect-square flex-col justify-between border-r border-ink bg-ink p-4 text-paper">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-paper/55">
+                    01 / Bu
+                  </span>
+                  <span className="font-serif text-[42px] leading-none">This</span>
+                  <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-paper/55">
+                    Seçenek A
+                  </span>
+                </div>
+                <div className="flex aspect-square flex-col justify-between bg-white p-4">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-ink/65">
+                    02 / Şu
+                  </span>
+                  <span className="pl-7 font-serif text-[42px] leading-none">That</span>
+                  <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-ink/65">
+                    Seçenek B
+                  </span>
+                </div>
+              </div>
+              <span className="absolute left-1/2 top-1/2 flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center border border-ink bg-signal font-serif text-xl italic text-ink">
+                /
+              </span>
+            </div>
+            <p className="mt-2 text-right font-mono text-[8px] uppercase tracking-[0.16em] text-ink/65">
+              Şekil 01 — Karar şeması
+            </p>
+          </div>
         </div>
-        <Link href="/create" className="flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-700">
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>Fikir Sor</span>
-        </Link>
+
+        <div className="mt-7 border-y border-line font-mono text-[9px] uppercase tracking-[0.1em] text-ink/65 sm:grid sm:grid-cols-3 sm:gap-2 sm:py-3 sm:text-[10px]">
+          <span className="flex items-center justify-between border-b border-line py-2.5 sm:block sm:border-0 sm:py-0">
+            <span>01</span>
+            <span>
+              <span className="mx-1 hidden sm:inline">—</span>Tek oy hakkı
+            </span>
+          </span>
+          <span className="flex items-center justify-between border-b border-line py-2.5 sm:block sm:border-0 sm:py-0 sm:text-center">
+            <span>02</span>
+            <span>
+              <span className="mx-1 hidden sm:inline">—</span>Anında sonuç
+            </span>
+          </span>
+          <span className="flex items-center justify-between py-2.5 sm:block sm:py-0 sm:text-right">
+            <span>03</span>
+            <span>
+              <span className="mx-1 hidden sm:inline">—</span>2–5 seçenek
+            </span>
+          </span>
+        </div>
+      </section>
+
+      {/* Misafir bilgilendirmesi */}
+      {!loading && !currentUserId && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border border-ink bg-smoke px-4 py-3">
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-ink/65 sm:text-[10px]">
+            Misafir görünümü
+            <span
+              aria-hidden
+              className="mx-2 inline-block h-3 w-px bg-ink/40 align-middle"
+            />
+            Oy vermek için giriş yap
+          </span>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 bg-ink px-3 py-2 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-paper transition-colors hover:bg-signal hover:text-ink"
+          >
+            Giriş yap
+            <ArrowRight className="h-3 w-3" />
+          </Link>
+        </div>
+      )}
+
+      {/* Akış başlığı */}
+      <div id="feed" className="scroll-mt-24 border-b border-ink pb-3">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-ink/65">
+              02 — Akış
+            </p>
+            <h2 className="mt-1 font-serif text-3xl leading-none tracking-[-0.01em] text-ink sm:text-4xl">
+              En yeni anketler
+            </h2>
+          </div>
+          {!loading && polls.length > 0 && (
+            <span className="mb-0.5 shrink-0 font-mono text-[9px] uppercase tracking-[0.14em] text-ink/65">
+              {String(polls.length).padStart(2, "0")} anket
+            </span>
+          )}
+        </div>
       </div>
 
       {error && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-red-100 bg-red-50 p-6 text-center text-sm text-red-700">
-          <AlertCircle className="mb-2 h-6 w-6 text-red-500" />
-          <p>{error}</p>
-          <button
-            type="button"
-            onClick={() => {
-              setLoading(true);
-              setRetryCount((prev) => prev + 1);
-            }}
-            className="mt-3 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700"
-          >
-            Tekrar Dene
-          </button>
+        <div className="border border-line border-l-2 border-l-alert bg-white p-5">
+          <div className="flex items-start gap-3">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center bg-signal text-ink">
+              <AlertCircle className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-ink/65">
+                Hata
+              </p>
+              <p className="mt-1 text-sm text-ink">{error}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setLoading(true);
+                  setRetryCount((prev) => prev + 1);
+                }}
+                className="mt-4 bg-ink px-4 py-2.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-signal hover:text-ink"
+              >
+                Tekrar dene
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       {loading && (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
-          <p className="mt-3 text-sm font-medium">Anketler yükleniyor...</p>
+        <div>
+          <p role="status" className="sr-only">
+            Anketler yükleniyor...
+          </p>
+          <div className="space-y-4" aria-hidden>
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="border border-line bg-white p-5 sm:p-6">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-9 w-9 animate-pulse bg-line/70" />
+                  <div className="space-y-1.5">
+                    <div className="h-2.5 w-24 animate-pulse bg-line/70" />
+                    <div className="h-2 w-16 animate-pulse bg-line/50" />
+                  </div>
+                </div>
+                <div className="mt-5 h-6 w-3/4 animate-pulse bg-line/70" />
+                <div className="mt-5 space-y-2">
+                  <div className="h-11 border border-line bg-smoke/40" />
+                  <div className="h-11 border border-line bg-smoke/40" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {!loading && !error && polls.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-10 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
-            <PlusCircle className="h-6 w-6" />
-          </div>
-          <h2 className="mt-3 text-base font-semibold text-gray-900">Henüz anket yok</h2>
-          <p className="mt-1 text-xs text-gray-500 max-w-sm mx-auto">
-            İlk kararsız kalan sen ol! Hemen yeni bir anket açıp topluluğun fikrini al.
+        <div className="border border-ink bg-white p-7 sm:p-10">
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-ink/65">
+            Kayıt yok
+          </p>
+          <h2 className="mt-3 font-serif text-3xl leading-none tracking-tight text-ink sm:text-4xl">
+            Henüz anket yok.
+          </h2>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-ink/65">
+            İlk kararsız kalan sen ol. Sorunu yaz, seçenekleri koy; topluluk
+            karar versin.
           </p>
           <Link
             href="/create"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white shadow-sm transition hover:bg-indigo-700"
+            className="group mt-6 inline-flex items-center gap-3 bg-ink px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-signal hover:text-ink"
           >
-            İlk Anketi Oluştur
+            İlk anketi oluştur
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </Link>
         </div>
       )}
@@ -303,23 +468,32 @@ export default function FeedPage() {
             />
           ))}
 
-          {hasMore && (
-            <div className="pt-2 text-center">
-              <button
-                type="button"
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 active:scale-95 disabled:opacity-50"
-              >
-                {loadingMore ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin text-indigo-600" />
-                    <span>Yükleniyor...</span>
-                  </>
-                ) : (
-                  <span>Daha Fazla Yükle</span>
-                )}
-              </button>
+          {hasMore ? (
+            <button
+              type="button"
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              className="group flex w-full items-center justify-center gap-2 border border-ink py-3.5 font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink transition-colors hover:bg-ink hover:text-paper disabled:opacity-50"
+            >
+              {loadingMore ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  <span>Yükleniyor</span>
+                </>
+              ) : (
+                <>
+                  <span>Daha fazla yükle</span>
+                  <ArrowDown className="h-3.5 w-3.5 transition-transform group-hover:translate-y-0.5" />
+                </>
+              )}
+            </button>
+          ) : (
+            <div className="flex items-center gap-3 pt-1">
+              <span className="h-px flex-1 bg-line" />
+              <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-ink/65">
+                Akışın sonu
+              </span>
+              <span className="h-px flex-1 bg-line" />
             </div>
           )}
         </div>
