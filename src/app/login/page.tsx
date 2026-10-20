@@ -2,19 +2,59 @@ import type { Metadata } from "next";
 import { AuthForm } from "@/components/AuthForm";
 
 export const metadata: Metadata = {
-  title: "Giriş Yap | ThisOrThat",
+  title: "Giriş Yap",
   description: "ThisOrThat hesabına giriş yap.",
 };
 
 export default function LoginPage() {
   return (
-    <div className="mx-auto w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 shadow-sm">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold tracking-tight text-gray-900">Tekrar Hoş Geldin</h1>
-        <p className="mt-1 text-sm text-gray-500">Oy vermek ve anket oluşturmak için giriş yap</p>
+    <div className="mx-auto w-full max-w-3xl">
+      <div className="border border-ink bg-white">
+        <div className="grid md:grid-cols-[0.9fr_1.1fr]">
+          <aside className="relative flex flex-col justify-between overflow-hidden bg-ink p-6 text-paper sm:p-8 md:min-h-[560px]">
+            <div className="flex items-center justify-between">
+              <span className="font-serif text-2xl leading-none tracking-[-0.02em]">
+                this<span className="mx-0.5 italic text-signal">/</span>or
+                <span className="mx-0.5 italic text-signal">/</span>that
+              </span>
+              <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-paper/55">
+                Giriş / 01
+              </span>
+            </div>
+
+            <p className="mt-8 max-w-[15rem] font-serif text-3xl leading-[1.05] tracking-[-0.01em] md:mt-0 md:text-4xl">
+              Fikrini sor.
+              <br />
+              <span className="italic text-paper/60">Kararı topluluk versin.</span>
+            </p>
+
+            <div className="mt-8 flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.16em] text-paper/55">
+              <span className="h-1.5 w-1.5 bg-signal" />
+              Ücretsiz · 30 saniyede giriş
+            </div>
+          </aside>
+
+          <div className="p-6 sm:p-9">
+            <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-ink/65">
+              Hesap — 01
+            </p>
+            <h1 className="mt-2 font-serif text-4xl leading-none tracking-[-0.02em] text-ink">
+              Tekrar hoş geldin.
+            </h1>
+            <p className="mt-3 text-sm leading-relaxed text-ink/65">
+              Oy vermek ve anket açmak için giriş yap.
+            </p>
+
+            <div className="mt-7">
+              <AuthForm mode="login" />
+            </div>
+          </div>
+        </div>
       </div>
 
-      <AuthForm mode="login" />
+      <p className="mt-3 text-right font-mono text-[8px] uppercase tracking-[0.16em] text-ink/65">
+        Kararsız kalma, topluluğa sor.
+      </p>
     </div>
   );
 }
