@@ -71,4 +71,4 @@ Tarayıcınızda [http://localhost:3000](http://localhost:3000) adresine gidin.
 - ✅ **Oy Verme:** Tek tıkla oy verme, anlık `transition-all duration-500` animasyonlu yüzde barları, oy verilen seçenekte `Check` rozeti.
 - ✅ **Tek Oy Kuralı:** Bir kullanıcı bir ankete yalnızca 1 kez oy verebilir (PostgreSQL `unique` kısıtı korumalı).
 - ✅ **Anket Silme:** Sadece anketin sahibi kendi anketini satır içi onay korumasıyla silebilir (cascade ile oylar ve seçenekler otomatik temizlenir).
-- ✅ **Mobile-First & Sade UI:** `max-w-xl` tek sütun, duyarlı Navbar ve boş/hata durumu yönetimi.
+- ✅ **Mobile-First & Editoryal UI:** `max-w-3xl` yerleşim, serif başlıklar, mono etiketler, duyarlı Navbar ve boş/hata durumu yönetimi.
