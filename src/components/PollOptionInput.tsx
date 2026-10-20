@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
-import { ImagePlus, Trash2, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { ImagePlus, Trash2 } from "lucide-react";
 
 interface PollOptionInputProps {
   index: number;
@@ -24,22 +24,33 @@ export function PollOptionInput({
   onRemove,
 }: PollOptionInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert("Görsel boyutu en fazla 2MB olabilir.");
-        return;
-      }
-      onImageSelect(file);
+    e.target.value = "";
+
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setFileError("Görsel boyutu en fazla 2MB olabilir.");
+      return;
     }
+
+    setFileError(null);
+    onImageSelect(file);
   }
 
   return (
-    <div className="space-y-2 rounded-xl border border-gray-200 bg-white p-3.5 shadow-2xs">
+    <div className="border border-line bg-white p-2.5 transition-colors focus-within:border-ink">
       <div className="flex items-center gap-2">
-        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-gray-100 text-xs font-bold text-gray-600">
+        <span
+          className={`flex h-7 w-7 shrink-0 items-center justify-center border font-mono text-[10px] font-semibold transition-colors ${
+            text.trim()
+              ? "border-ink bg-ink text-paper"
+              : "border-ink/20 text-ink/65"
+          }`}
+        >
           {String.fromCharCode(65 + index)}
         </span>
 
@@ -50,7 +61,8 @@ export function PollOptionInput({
           value={text}
           onChange={(e) => onTextChange(e.target.value)}
           placeholder={`Seçenek ${index + 1}`}
-          className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm shadow-2xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          aria-label={`Seçenek ${index + 1} metni`}
+          className="min-w-0 flex-1 border-0 bg-transparent px-1 py-1.5 text-sm text-ink placeholder:text-ink/30 focus:outline-none"
         />
 
         <input
@@ -65,10 +77,11 @@ export function PollOptionInput({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           title="Görsel ekle (opsiyonel)"
-          className={`rounded-lg p-2 transition ${
+          aria-label="Görsel ekle"
+          className={`flex h-8 w-8 shrink-0 items-center justify-center border transition-colors ${
             imagePreview
-              ? "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
-              : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              ? "border-ink bg-signal text-ink"
+              : "border-transparent text-ink/35 hover:border-ink hover:text-ink"
           }`}
         >
           <ImagePlus className="h-4 w-4" />
@@ -79,30 +92,58 @@ export function PollOptionInput({
             type="button"
             onClick={onRemove}
             title="Seçeneği kaldır"
-            className="rounded-lg p-2 text-gray-400 transition hover:bg-red-50 hover:text-red-600"
+            aria-label="Seçeneği kaldır"
+            className="flex h-8 w-8 shrink-0 items-center justify-center border border-transparent text-ink/35 transition-colors hover:border-ink hover:text-alert"
           >
             <Trash2 className="h-4 w-4" />
           </button>
         )}
       </div>
 
+      {fileError && (
+        <p className="mt-2 pl-9 font-mono text-[9px] uppercase tracking-[0.04em] text-alert">
+          {fileError}
+        </p>
+      )}
+
       {imagePreview && (
-        <div className="relative inline-block overflow-hidden rounded-lg border border-gray-200">
-          <Image
-            src={imagePreview}
-            alt="Önizleme"
-            width={120}
-            height={80}
-            className="h-20 w-32 object-cover"
-            unoptimized
-          />
-          <button
-            type="button"
-            onClick={() => onImageSelect(null)}
-            className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white hover:bg-black/80"
-          >
-            <X className="h-3 w-3" />
-          </button>
+        <div className="mt-2.5 flex items-start gap-3 border-t border-line pt-2.5">
+          <div className="relative h-20 w-28 shrink-0 border border-line bg-smoke">
+            <Image
+              src={imagePreview}
+              alt="Seçenek görseli önizlemesi"
+              fill
+              className="object-cover"
+              unoptimized
+            />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-mono text-[8px] uppercase tracking-[0.14em] text-ink/65">
+              Görsel eklendi
+            </p>
+            <p className="mt-1 font-mono text-[9px] text-ink/70">
+              Seçenek {index + 1}
+            </p>
+            <div className="mt-2 flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setFileError(null);
+                  onImageSelect(null);
+                }}
+                className="font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-alert underline underline-offset-2 transition-colors hover:bg-signal hover:text-ink hover:no-underline"
+              >
+                Kaldır
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="font-mono text-[8px] font-semibold uppercase tracking-[0.12em] text-ink/65 underline underline-offset-2 transition-colors hover:text-ink"
+              >
+                Değiştir
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PollOptionInput } from "./PollOptionInput";
-import { Plus, Loader2, AlertCircle } from "lucide-react";
+import { AlertCircle, ArrowUpRight, Loader2, Plus } from "lucide-react";
 
 type OptionState = {
   id: string;
@@ -138,17 +138,35 @@ export function PollForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
-        <div className="flex items-center gap-2 rounded-xl bg-red-50 p-3 text-xs text-red-700">
-          <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 border border-line border-l-2 border-l-alert bg-white p-3 text-xs leading-relaxed text-ink"
+        >
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-alert" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Soru Girişi */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-800">Anket Sorun</label>
+      {/* Soru */}
+      <section>
+        <div className="flex items-baseline justify-between border-b border-ink pb-2">
+          <div className="flex items-baseline gap-3">
+            <span className="font-serif text-2xl italic leading-none text-alert">01</span>
+            <h2 className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink">
+              Anket sorun
+            </h2>
+          </div>
+          <span
+            className={`font-mono text-[9px] tabular-nums ${
+              question.length > 180 ? "text-alert" : "text-ink/65"
+            }`}
+          >
+            {question.length}/200
+          </span>
+        </div>
+
         <textarea
           required
           rows={3}
@@ -157,61 +175,80 @@ export function PollForm() {
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
           placeholder="Bugün sinemaya mı gitsem, restorana mı?"
-          className="mt-1.5 w-full rounded-xl border border-gray-300 p-3 text-sm shadow-2xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+          aria-label="Anket sorunuz"
+          className="mt-3 w-full resize-none border border-line bg-paper/40 p-4 font-serif text-xl leading-snug tracking-[-0.01em] text-ink transition-colors placeholder:text-ink/30 focus:border-ink focus:bg-white focus:outline-none focus:ring-1 focus:ring-ink sm:text-2xl"
         />
-        <div className="mt-1 flex justify-between text-[11px] text-gray-400">
+
+        <div className="mt-2 flex items-center justify-between font-mono text-[8px] uppercase tracking-[0.12em] text-ink/65">
           <span>En az 3, en fazla 200 karakter</span>
-          <span>{question.length}/200</span>
+          <span>{question.trim().length < 3 ? "Eksik" : "Uygun"}</span>
         </div>
-      </div>
+      </section>
 
       {/* Seçenekler */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <label className="text-sm font-semibold text-gray-800">Seçenekler (2 - 5)</label>
-          <span className="text-xs text-gray-400">{options.length}/5 Seçenek</span>
+      <section>
+        <div className="flex items-baseline justify-between border-b border-ink pb-2">
+          <div className="flex items-baseline gap-3">
+            <span className="font-serif text-2xl italic leading-none text-alert">02</span>
+            <h2 className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-ink">
+              Seçenekler
+            </h2>
+          </div>
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em] text-ink/65">
+            {options.length} / 5
+          </span>
         </div>
 
-        {options.map((opt, idx) => (
-          <PollOptionInput
-            key={opt.id}
-            index={idx}
-            text={opt.text}
-            imagePreview={opt.imagePreview}
-            canRemove={options.length > 2}
-            onTextChange={(val) => handleTextChange(idx, val)}
-            onImageSelect={(file) => handleImageSelect(idx, file)}
-            onRemove={() => handleRemoveOption(idx)}
-          />
-        ))}
+        <div className="mt-3 space-y-2.5">
+          {options.map((opt, idx) => (
+            <PollOptionInput
+              key={opt.id}
+              index={idx}
+              text={opt.text}
+              imagePreview={opt.imagePreview}
+              canRemove={options.length > 2}
+              onTextChange={(val) => handleTextChange(idx, val)}
+              onImageSelect={(file) => handleImageSelect(idx, file)}
+              onRemove={() => handleRemoveOption(idx)}
+            />
+          ))}
+        </div>
 
         {options.length < 5 && (
           <button
             type="button"
             onClick={handleAddOption}
-            className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-gray-300 py-2.5 text-xs font-semibold text-indigo-600 transition hover:border-indigo-400 hover:bg-indigo-50/50"
+            className="mt-2.5 flex w-full items-center justify-center gap-2 border border-dashed border-ink/30 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-ink/65 transition-colors hover:border-ink hover:bg-smoke hover:text-ink"
           >
-            <Plus className="h-4 w-4" />
-            <span>Seçenek Ekle</span>
+            <Plus className="h-3.5 w-3.5" />
+            Seçenek ekle
           </button>
         )}
-      </div>
+      </section>
 
-      {/* Gönder Butonu */}
-      <button
-        type="submit"
-        disabled={submitting}
-        className="flex w-full items-center justify-center rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
-      >
-        {submitting ? (
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Anket Yayınlanıyor...</span>
-          </div>
-        ) : (
-          "Anketi Yayınla"
-        )}
-      </button>
+      {/* Gönder */}
+      <div className="border-t border-line pt-5">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="group flex w-full items-center justify-center gap-3 bg-ink py-3.5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-paper transition-colors hover:bg-signal hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:pointer-events-none disabled:opacity-40"
+        >
+          {submitting ? (
+            <>
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              <span>Yayınlanıyor</span>
+            </>
+          ) : (
+            <>
+              <span>Anketi yayınla</span>
+              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </>
+          )}
+        </button>
+        <p className="mt-2.5 text-center font-mono text-[8px] uppercase tracking-[0.14em] text-ink/65">
+          Yayınladıktan sonra soru ve seçenekler düzenlenemez
+        </p>
+      </div>
     </form>
   );
 }

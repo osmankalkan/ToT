@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AlertOctagon } from "lucide-react";
+import { Home, RotateCcw } from "lucide-react";
 
 export default function ErrorBoundary({
   error,
@@ -11,28 +11,45 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-red-100 bg-white p-12 text-center shadow-sm">
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-600">
-        <AlertOctagon className="h-7 w-7" />
-      </div>
-      <h1 className="mt-4 text-xl font-bold text-gray-900">Beklenmeyen Bir Hata Oluştu</h1>
-      <p className="mt-1 text-sm text-gray-500 max-w-xs">
-        {error.message || "Sayfa yüklenirken bir problem yaşandı. Lütfen tekrar deneyin."}
-      </p>
-      <div className="mt-6 flex gap-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
-        >
-          Tekrar Dene
-        </button>
-        <Link
-          href="/"
-          className="rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 shadow-2xs transition hover:bg-gray-50"
-        >
-          Ana Sayfa
-        </Link>
+    <div className="mx-auto w-full max-w-2xl">
+      <div className="border border-ink bg-white">
+        <div className="flex items-center justify-between border-b border-ink px-5 py-3">
+          <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-ink/65">
+            Beklenmeyen durum
+          </p>
+          <span className="h-2 w-2 bg-signal" />
+        </div>
+
+        <div className="p-6 sm:p-10">
+          <p className="font-serif text-[92px] leading-none tracking-[-0.04em] text-ink sm:text-[112px]">
+            Hata<span className="text-alert">.</span>
+          </p>
+
+          <h1 className="mt-4 font-serif text-3xl leading-tight tracking-[-0.01em] text-ink">
+            Bir şeyler ters gitti.
+          </h1>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-ink/65">
+            {error.message || "Sayfa yüklenirken bir problem yaşandı. Lütfen tekrar deneyin."}
+          </p>
+
+          <div className="mt-7 flex flex-col gap-2.5 sm:flex-row">
+            <button
+              type="button"
+              onClick={reset}
+              className="inline-flex items-center justify-center gap-2 bg-ink px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:bg-signal hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              Tekrar dene
+            </button>
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center gap-2 border border-ink px-5 py-3 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-smoke focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            >
+              <Home className="h-3.5 w-3.5" />
+              Ana sayfa
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
